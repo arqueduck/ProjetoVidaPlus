@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.deps import get_db
+from app.deps import get_db, get_current_user
+from app.models.user import User  
 from app.models.consultation import Consulta
 from app.models.patient import Paciente
 from app.models.professional import Profissional
@@ -12,6 +13,7 @@ from app.schemas.consultation import (
     ConsultaUpdate,
     ConsultaStatusUpdate,
 )
+from app.services.logs import registrar_log
 
 router = APIRouter(prefix="/consultas", tags=["Consultas"])
 
@@ -20,6 +22,7 @@ router = APIRouter(prefix="/consultas", tags=["Consultas"])
 def criar_consulta(
     consulta_in: ConsultaCreate,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     # valida se paciente existe
     if not db.get(Paciente, consulta_in.paciente_id):
@@ -54,6 +57,14 @@ def criar_consulta(
     db.add(db_consulta)
     db.commit()
     db.refresh(db_consulta)
+    
+    registrar_log(
+        db=db,
+        acao="CRIAR_CONSULTA",
+        usuario=current_user,
+        detalhes=f"Consulta ID={db_consulta.id} criada pelo usuário ID={current_user.id}",
+    )
+    
     return db_consulta
 
 
@@ -66,6 +77,7 @@ def listar_consultas(db: Session = Depends(get_db)):
 def obter_consulta(
     consulta_id: int,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     consulta = db.query(Consulta).get(consulta_id)
     if not consulta:
@@ -73,6 +85,14 @@ def obter_consulta(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Consulta não encontrada.",
         )
+        
+    registrar_log(
+        db=db,
+        acao="CRIAR_CONSULTA",
+        usuario=current_user,
+        detalhes=f"Consulta ID={obter_consulta.id} criada pelo usuário ID={current_user.id}",
+    )
+    
     return consulta
 
 
@@ -80,7 +100,15 @@ def obter_consulta(
 def listar_consultas_por_paciente(
     paciente_id: int,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
+    registrar_log(
+        db=db,
+        acao="CRIAR_CONSULTA",
+        usuario=current_user,
+        detalhes=f"Consulta ID={listar_consultas_por_paciente.id} criada pelo usuário ID={current_user.id}",
+    )
+    
     return db.query(Consulta).filter(Consulta.paciente_id == paciente_id).all()
 
 
@@ -88,12 +116,21 @@ def listar_consultas_por_paciente(
 def listar_consultas_por_profissional(
     profissional_id: int,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
+    registrar_log(
+        db=db,
+        acao="CRIAR_CONSULTA",
+        usuario=current_user,
+        detalhes=f"Consulta ID={listar_consultas_por_profissional.id} criada pelo usuário ID={current_user.id}",
+    )
+    
     return (
         db.query(Consulta)
         .filter(Consulta.profissional_id == profissional_id)
         .all()
     )
+    
 
 
 @router.put("/{consulta_id}", response_model=ConsultaRead)
@@ -101,6 +138,7 @@ def atualizar_consulta(
     consulta_id: int,
     consulta_up: ConsultaUpdate,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     consulta = db.query(Consulta).get(consulta_id)
     if not consulta:
@@ -143,6 +181,14 @@ def atualizar_consulta(
 
     db.commit()
     db.refresh(consulta)
+    
+    registrar_log(
+        db=db,
+        acao="CRIAR_CONSULTA",
+        usuario=current_user,
+        detalhes=f"Consulta ID={atualizar_consulta.id} criada pelo usuário ID={current_user.id}",
+    )
+
     return consulta
 
 
@@ -151,6 +197,7 @@ def atualizar_status_consulta(
     consulta_id: int,
     status_in: ConsultaStatusUpdate,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     consulta = db.query(Consulta).get(consulta_id)
     if not consulta:
@@ -162,4 +209,12 @@ def atualizar_status_consulta(
     consulta.status = status_in.status
     db.commit()
     db.refresh(consulta)
+    
+    registrar_log(
+        db=db,
+        acao="CRIAR_CONSULTA",
+        usuario=current_user,
+        detalhes=f"Consulta ID={atualizar_status_consulta.id} criada pelo usuário ID={current_user.id}",
+    )
+    
     return consulta

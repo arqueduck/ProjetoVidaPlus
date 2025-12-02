@@ -4,3 +4,4 @@ from .professional import Profissional
 from .unit import Unidade
 from .consultation import Consulta
 from .medical_record import Prontuario 
+from .log import LogSistema

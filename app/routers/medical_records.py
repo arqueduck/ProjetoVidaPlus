@@ -1,12 +1,14 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.deps import get_db
+from app.deps import get_db, get_current_user
 from app.models.patient import Paciente
 from app.models.professional import Profissional
 from app.models.consultation import Consulta
 from app.models.medical_record import Prontuario
+from app.models.user import User
 from app.schemas.medical_record import ProntuarioCreate, ProntuarioRead
+from app.services.logs import registrar_log
 
 router = APIRouter(prefix="/prontuarios", tags=["Prontuários"])
 
@@ -15,6 +17,7 @@ router = APIRouter(prefix="/prontuarios", tags=["Prontuários"])
 def criar_prontuario(
     prontuario_in: ProntuarioCreate,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     # valida paciente
     paciente = db.get(Paciente, prontuario_in.paciente_id)
@@ -52,6 +55,14 @@ def criar_prontuario(
     db.add(db_prontuario)
     db.commit()
     db.refresh(db_prontuario)
+    
+    registrar_log(
+        db=db,
+        acao="CRIAR_PRONTUARIO",
+        usuario=current_user,
+        detalhes=f"Prontuário ID={db_prontuario.id} criado pelo usuário ID={current_user.id}",
+    )
+    
     return db_prontuario
 
 
@@ -59,6 +70,7 @@ def criar_prontuario(
 def listar_prontuarios_por_paciente(
     paciente_id: int,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     # opcional: garantir que o paciente exista
     paciente = db.get(Paciente, paciente_id)
@@ -68,6 +80,13 @@ def listar_prontuarios_por_paciente(
             detail="Paciente não encontrado.",
         )
 
+    registrar_log(
+        db=db,
+        acao="CRIAR_PRONTUARIO",
+        usuario=current_user,
+        detalhes=f"Prontuário ID={listar_prontuarios_por_paciente.id} criado pelo usuário ID={current_user.id}",
+    )
+    
     return (
         db.query(Prontuario)
         .filter(Prontuario.paciente_id == paciente_id)
@@ -80,6 +99,7 @@ def listar_prontuarios_por_paciente(
 def obter_prontuario(
     prontuario_id: int,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     prontuario = db.get(Prontuario, prontuario_id)
     if not prontuario:
@@ -87,4 +107,12 @@ def obter_prontuario(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Prontuário não encontrado.",
         )
+        
+    registrar_log(
+        db=db,
+        acao="CRIAR_PRONTUARIO",
+        usuario=current_user,
+        detalhes=f"Prontuário ID={obter_prontuario.id} criado pelo usuário ID={current_user.id}",
+    )
+    
     return prontuario

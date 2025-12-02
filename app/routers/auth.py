@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from jose import JWTError, jwt
 from sqlalchemy.orm import Session
 
+
 from app.models.user import User
 from app.core.config import ALGORITHM, SECRET_KEY, get_access_token_expires
 from app.core.security import (
@@ -14,6 +15,7 @@ from app.core.security import (
 from app.deps import get_db
 from app.schemas.auth import LoginRequest, Token
 from app.schemas.user import UserCreate, UserRead
+from app.services.logs import registrar_log
 
 router = APIRouter(prefix="/auth", tags=["Autenticação"])
 
@@ -59,6 +61,19 @@ def login(form_data: LoginRequest, db: Session = Depends(get_db)):
     access_token = create_access_token(
         data={"sub": str(user.id), "tipo": user.tipo},
         expires_delta=access_token_expires,
+    )
+    access_token_expires = get_access_token_expires()
+    access_token = create_access_token(
+        data={"sub": str(user.id), "tipo": user.tipo},
+        expires_delta=access_token_expires,
+    )
+
+    # Novo: registra log de login bem-sucedido
+    registrar_log(
+        db=db,
+        acao="LOGIN_SUCESSO",
+        usuario=user,
+        detalhes=f"Login realizado para o usuário ID={user.id}, tipo={user.tipo}",
     )
 
     return Token(access_token=access_token)

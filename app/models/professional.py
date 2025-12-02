@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
+from app.database import Base
 
 from app.database import Base
 
@@ -14,7 +15,11 @@ class Profissional(Base):
     registro_conselho = Column(String, nullable=False)  # ex.: número do CRM/COREN
     tipo_conselho = Column(String, nullable=False)      # ex.: "CRM", "COREN"
     especialidade = Column(String, nullable=False)      # ex.: "Cardiologia"
-    # vamos deixar só como inteiro por enquanto; depois conectamos com a tabela de unidades
-    unidade_id = Column(Integer, nullable=True)
 
-    usuario = relationship("User", backref="profissional", uselist=False)
+    unidade_id = Column(
+        Integer,
+        ForeignKey("unidades.id", ondelete="RESTRICT"),
+        nullable=False,
+    )
+
+    unidade = relationship("Unidade", back_populates="profissionais")
