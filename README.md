@@ -1,4 +1,3 @@
-readme: |
   # 🏥 SGHSS – Sistema de Gestão Hospitalar e de Serviços de Saúde (VidaPlus)
 
   API Back-end desenvolvida para o projeto multidisciplinar da UNINTER (2025), com foco na modelagem, arquitetura e implementação de um sistema hospitalar para a instituição fictícia VidaPlus.
