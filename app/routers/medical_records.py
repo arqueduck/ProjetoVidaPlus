@@ -112,7 +112,10 @@ def obter_prontuario(
         db=db,
         acao="CRIAR_PRONTUARIO",
         usuario=current_user,
-        detalhes=f"Prontuário ID={obter_prontuario.id} criado pelo usuário ID={current_user.id}",
+        detalhes=(
+            f"Prontuário ID={prontuario.id} consultado pelo usuário "
+            f"ID={current_user.id}",
+        )
     )
     
     return prontuario

@@ -214,7 +214,10 @@ def atualizar_status_consulta(
         db=db,
         acao="CRIAR_CONSULTA",
         usuario=current_user,
-        detalhes=f"Consulta ID={atualizar_status_consulta.id} criada pelo usuário ID={current_user.id}",
+        detalhes=(
+            f"Status da consulta ID={consulta.id} atualizado para "
+            f"{consulta.status} pelo usuário ID={current_user.id}",
+        )
     )
     
     return consulta
