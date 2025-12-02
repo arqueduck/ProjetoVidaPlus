@@ -36,7 +36,6 @@ def get_current_user(
     )
 
     try:
-        # ⬇️ aqui usamos SECRET_KEY direto, sem settings
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id: str | None = payload.get("sub")
         if user_id is None:

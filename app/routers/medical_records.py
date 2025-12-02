@@ -72,7 +72,6 @@ def listar_prontuarios_por_paciente(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    # opcional: garantir que o paciente exista
     paciente = db.get(Paciente, paciente_id)
     if not paciente:
         raise HTTPException(
