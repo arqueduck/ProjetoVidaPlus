@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class UnidadeBase(BaseModel):
@@ -15,8 +15,7 @@ class UnidadeCreate(UnidadeBase):
 class UnidadeRead(UnidadeBase):
     id: int
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class UnidadeUpdate(BaseModel):

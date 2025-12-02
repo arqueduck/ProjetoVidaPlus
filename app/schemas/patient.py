@@ -1,5 +1,5 @@
 from datetime import date
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, ConfigDict
 
 
 class PacienteBase(BaseModel):
@@ -29,8 +29,7 @@ class PacienteRead(BaseModel):
     plano_saude: str | None = None
     numero_carteirinha: str | None = None
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class PacienteUpdate(BaseModel):

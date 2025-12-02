@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, ConfigDict
 
 
 class ProfissionalBase(BaseModel):
@@ -26,8 +26,7 @@ class ProfissionalRead(BaseModel):
     especialidade: str
     unidade_id: int | None = None
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ProfissionalUpdate(BaseModel):

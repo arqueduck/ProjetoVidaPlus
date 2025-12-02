@@ -1,5 +1,5 @@
 from datetime import datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class ConsultaBase(BaseModel):
@@ -25,8 +25,7 @@ class ConsultaRead(BaseModel):
     status: str
     observacoes: str | None = None
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ConsultaUpdate(BaseModel):

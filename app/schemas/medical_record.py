@@ -1,5 +1,5 @@
 from datetime import datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class ProntuarioBase(BaseModel):
@@ -23,5 +23,4 @@ class ProntuarioRead(BaseModel):
     descricao: str
     tipo_registro: str
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)

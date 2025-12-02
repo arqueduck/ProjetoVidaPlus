@@ -1,5 +1,5 @@
 from typing import Literal
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, ConfigDict
 
 
 UserType = Literal["PACIENTE", "PROFISSIONAL", "ADMIN"]
@@ -18,5 +18,4 @@ class UserCreate(UserBase):
 class UserRead(UserBase):
     id: int
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
